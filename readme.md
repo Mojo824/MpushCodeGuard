@@ -68,7 +68,7 @@ Before installing Mpush, ensure you have:
 1. Clone this repo:  
     ```bash
     git clone https://github.com/yourusername/Mpush.git
-    cd Mpush
+    cd "Mpush CodeGuard"
     ```
 
 2. Run the installer:  
