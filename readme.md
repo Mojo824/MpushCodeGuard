@@ -113,6 +113,8 @@ Example:
   "default_commit_message": "Secure code auto-push from Mpush 🚀"
 }
 
+```
+
 📄 License: MIT – See [LICENSE](./LICENSE) for details.
 
 contact- insane.mjoshi@gmail.com
