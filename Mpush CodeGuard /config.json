@@ -1,0 +1,22 @@
+{
+    "email": {
+      "sender": "mojoai93@gmail.com",
+      "smtp_server": "smtp.gmail.com",
+      "smtp_port": 587,
+      "use_tls": true
+    },
+    "severity_thresholds": {
+      "reject_if_high": true,
+      "reject_if_medium": true,
+      "max_low": 3
+    },
+    "tools": {
+      "bandit": "bandit",
+      "eslint": "eslint",
+      "shellcheck": "shellcheck",
+      "semgrep": "semgrep"
+    },
+    "log_level": "INFO",
+    "default_commit_message": "Secure code auto-push from Mpush 🚀"
+  }
+  
