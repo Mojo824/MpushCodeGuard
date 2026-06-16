@@ -1,0 +1,150 @@
+{
+  "project": "/home/joshi/Pictures/koko",
+  "verdict": "Push",
+  "summary": {
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "total": 0
+  },
+  "stats": {
+    "total_scans": 10,
+    "pushed": 10,
+    "rejected": 0,
+    "review": 0
+  },
+  "history": [
+    {
+      "timestamp": "2026-06-16T22:30:48",
+      "project": "koko",
+      "repo": "llp",
+      "branch": "main",
+      "verdict": "Push",
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0,
+      "push_done": false,
+      "email_sent": true
+    },
+    {
+      "timestamp": "2026-06-16T23:11:07",
+      "project": "koko",
+      "repo": "kkl",
+      "branch": "main",
+      "verdict": "Push",
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0,
+      "push_done": false,
+      "email_sent": true
+    },
+    {
+      "timestamp": "2026-06-16T23:15:36",
+      "project": "koko",
+      "repo": "kk",
+      "branch": "main",
+      "verdict": "Push",
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0,
+      "push_done": false,
+      "email_sent": true
+    },
+    {
+      "timestamp": "2026-06-16T23:17:35",
+      "project": "koko",
+      "repo": "jklmno",
+      "branch": "main",
+      "verdict": "Push",
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0,
+      "push_done": false,
+      "email_sent": true
+    },
+    {
+      "timestamp": "2026-06-16T23:20:57",
+      "project": "koko",
+      "repo": "kkh",
+      "branch": "main",
+      "verdict": "Push",
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0,
+      "push_done": false,
+      "email_sent": true
+    },
+    {
+      "timestamp": "2026-06-16T23:24:41",
+      "project": "koko",
+      "repo": "hjg",
+      "branch": "main",
+      "verdict": "Push",
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0,
+      "push_done": false,
+      "email_sent": true
+    },
+    {
+      "timestamp": "2026-06-16T23:26:49",
+      "project": "koko",
+      "repo": "ggg",
+      "branch": "main",
+      "verdict": "Push",
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0,
+      "push_done": false,
+      "email_sent": true
+    },
+    {
+      "timestamp": "2026-06-16T23:30:14",
+      "project": "koko",
+      "repo": "fff",
+      "branch": "main",
+      "verdict": "Push",
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0,
+      "push_done": false,
+      "email_sent": true
+    },
+    {
+      "timestamp": "2026-06-16T23:32:03",
+      "project": "koko",
+      "repo": "ddd",
+      "branch": "main",
+      "verdict": "Push",
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0,
+      "push_done": false,
+      "email_sent": true
+    },
+    {
+      "timestamp": "2026-06-16T23:36:10",
+      "project": "koko",
+      "repo": "yuyu",
+      "branch": "main",
+      "verdict": "Push",
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0,
+      "push_done": true,
+      "email_sent": true
+    }
+  ],
+  "push_done": true,
+  "email_sent": true
+}

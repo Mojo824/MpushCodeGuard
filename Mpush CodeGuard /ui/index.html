@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mpush CodeGuard Dashboard</title>
+  <style>
+    :root {
+      --bg: #07111f;
+      --panel: rgba(10, 18, 32, 0.72);
+      --panel-2: rgba(16, 26, 45, 0.9);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #eaf1ff;
+      --muted: #9ab0d0;
+      --accent: #7c5cff;
+      --accent-2: #19d3ff;
+      --good: #39d98a;
+      --warn: #ffbd4a;
+      --bad: #ff5f6d;
+      --shadow: 0 20px 60px rgba(0,0,0,0.35);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; min-height: 100%; }
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(124, 92, 255, 0.22), transparent 28%),
+        radial-gradient(circle at top right, rgba(25, 211, 255, 0.18), transparent 24%),
+        linear-gradient(180deg, #040913 0%, var(--bg) 100%);
+    }
+
+    .wrap {
+      width: min(1200px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 48px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: var(--shadow);
+      font-size: 24px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0.3px;
+    }
+
+    .brand p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .pill {
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.04);
+      color: var(--muted);
+      font-size: 13px;
+      backdrop-filter: blur(12px);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 22px;
+      align-items: stretch;
+      margin-bottom: 22px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .hero-main {
+      padding: 34px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-main::after {
+      content: "";
+      position: absolute;
+      inset: auto -80px -80px auto;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(25,211,255,0.25), transparent 70%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(124, 92, 255, 0.14);
+      border: 1px solid rgba(124, 92, 255, 0.28);
+      color: #d9d2ff;
+      font-size: 13px;
+      margin-bottom: 18px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(34px, 5vw, 58px);
+      line-height: 1.02;
+      letter-spacing: -0.03em;
+    }
+
+    .hero-main p {
+      margin: 16px 0 0;
+      max-width: 62ch;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 16px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .btn {
+      border: 0;
+      padding: 12px 18px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      transition: transform .18s ease, opacity .18s ease, box-shadow .18s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary {
+      color: white;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 16px 34px rgba(124, 92, 255, 0.28);
+    }
+    .btn-ghost {
+      color: var(--text);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .hero-side {
+      padding: 22px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .stat-card {
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+    }
+
+    .stat-card .stat-label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .stat-card .stat-value {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 6px;
+    }
+
+    .stat-card .stat-note {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .metric {
+      padding: 18px;
+      border-radius: 18px;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+    }
+
+    .metric .label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .metric .value {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .metric .hint {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: repeat(12, 1fr);
+      margin-top: 18px;
+    }
+
+    .section {
+      padding: 22px;
+    }
+
+    .span-4 { grid-column: span 4; }
+    .span-6 { grid-column: span 6; }
+    .span-8 { grid-column: span 8; }
+    .span-12 { grid-column: span 12; }
+
+    .section h3 {
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
+
+    .section p.sub {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .chip {
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: #dce8ff;
+      font-size: 13px;
+    }
+
+    .steps {
+      display: grid;
+      gap: 12px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 40px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+    }
+
+    .step .num {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      color: white;
+      background: linear-gradient(135deg, rgba(124,92,255,0.95), rgba(25,211,255,0.9));
+    }
+
+    .step h4 {
+      margin: 0 0 6px;
+      font-size: 15px;
+    }
+
+    .step p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .table th, .table td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-size: 14px;
+    }
+
+    .table th {
+      color: #dce8ff;
+      background: rgba(255,255,255,0.04);
+    }
+
+    .table td {
+      color: var(--muted);
+    }
+
+    .table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .record-table td,
+    .record-table th {
+      white-space: nowrap;
+    }
+
+    .small-muted {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .ok { background: rgba(57,217,138,0.14); color: #b8f6d7; }
+    .warn { background: rgba(255,189,74,0.14); color: #ffe1a8; }
+    .bad { background: rgba(255,95,109,0.14); color: #ffc0c7; }
+
+    .neutral { background: rgba(154,176,208,0.12); color: #d7e2f5; }
+
+    .activity-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .activity-item {
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      display: grid;
+      gap: 6px;
+    }
+
+    .activity-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .activity-title {
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .activity-desc {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .bar {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      overflow: hidden;
+    }
+
+    .bar > span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    }
+
+    .chart-shell {
+      display: grid;
+      gap: 14px;
+    }
+
+    .pie-wrap {
+      display: grid;
+      grid-template-columns: 210px 1fr;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .pie {
+      width: 210px;
+      height: 210px;
+      border-radius: 50%;
+      background:
+        conic-gradient(var(--good) 0 74%, var(--bad) 74% 100%);
+      position: relative;
+      box-shadow: inre0 0 0 12px rgba(255,255,255,0.04);
+      margin: 0 auto;
+    }
+
+    .pie::after {
+      content: "";
+      position: absolute;
+      inset: 34px;
+      border-radius: 50%;
+      background: #091320;
+      border: 1px solid var(--border);
+    }
+
+    .pie-label {
+      position: absolute;
+      inset: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 1;
+    }
+
+    .pie-label strong {
+      display: block;
+      font-size: 30px;
+      letter-spacing: -0.04em;
+    }
+
+    .pie-label span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .legend {
+      display: grid;
+      gap: 10px;
+    }
+
+    .legend-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .legend-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .dot.good { background: var(--good); }
+    .dot.bad { background: var(--bad); }
+
+    .trend {
+      display: grid;
+      gap: 12px;
+    }
+
+    .trend-bars {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 12px;
+      align-items: end;
+      min-height: 220px;
+    }
+
+    .trend-item {
+      display: grid;
+      gap: 8px;
+      justify-items: center;
+    }
+
+    .trend-bar {
+      width: 100%;
+      min-height: 40px;
+      border-radius: 16px 16px 8px 8px;
+      background: linear-gradient(180deg, var(--accent-2), var(--accent));
+      box-shadow: 0 12px 24px rgba(25,211,255,0.18);
+    }
+
+    .trend-label {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .mini-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .mini-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .analytics-grid {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: repeat(12, 1fr);
+      margin-top: 18px;
+    }
+
+    .donut-wrap {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .donut {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: conic-gradient(var(--good) 0 72%, var(--warn) 72% 91%, var(--bad) 91% 100%);
+      position: relative;
+      margin: 0 auto;
+      box-shadow: inset 0 0 0 12px rgba(255,255,255,0.04);
+    }
+
+    .donut::after {
+      content: "";
+      position: absolute;
+      inset: 34px;
+      border-radius: 50%;
+      background: #091320;
+      border: 1px solid var(--border);
+    }
+
+    .donut-center {
+      position: absolute;
+      inset: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+      text-align: center;
+    }
+
+    .donut-center strong {
+      display: block;
+      font-size: 28px;
+      letter-spacing: -0.04em;
+    }
+
+    .donut-center span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .severity-bars {
+      display: grid;
+      gap: 12px;
+    }
+
+    .severity-bar {
+      display: grid;
+      gap: 8px;
+    }
+
+    .severity-bar-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .severity-track {
+      width: 100%;
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      overflow: hidden;
+    }
+
+    .severity-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    }
+
+    .sparkline {
+      display: grid;
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+      gap: 10px;
+      align-items: end;
+      min-height: 170px;
+    }
+
+    .spark-column {
+      display: grid;
+      gap: 6px;
+      justify-items: center;
+    }
+
+    .spark-bar {
+      width: 100%;
+      min-height: 24px;
+      border-radius: 12px 12px 6px 6px;
+      background: linear-gradient(180deg, rgba(25,211,255,0.95), rgba(124,92,255,0.95));
+      opacity: 0.9;
+    }
+
+    .spark-label {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .insights {
+      display: grid;
+      gap: 12px;
+    }
+
+    .insight {
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      display: grid;
+      gap: 6px;
+    }
+
+    .insight strong {
+      font-size: 15px;
+    }
+
+    .insight span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .footer {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 920px) {
+      .hero { grid-template-columns: 1fr; }
+      .stats-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .span-4, .span-6, .span-8, .span-12 { grid-column: span 12; }
+    }
+
+    @media (max-width: 640px) {
+      .wrap { width: min(100% - 20px, 1200px); }
+      .hero-main, .section { padding: 18px; }
+      h2 { font-size: 30px; }
+      .topbar { flex-direction: column; align-items: flex-start; }
+      .stats-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">🛡️</div>
+        <div>
+          <h1>Mpush CodeGuard</h1>
+          <p>Security scan dashboard and GitHub push gate</p>
+        </div>
+      </div>
+      <div class="pill">Visual concept for the Mpush tool</div>
+    </div>
+
+    <section class="hero">
+      <div class="card hero-main">
+        <div class="eyebrow">● Live backend dashboard</div>
+        <h2 id="live-title">Loading latest scan data…</h2>
+        <p id="live-summary">
+          The frontend is waiting for the latest backend result file.
+        </p>
+        <div class="actions">
+          <button class="btn btn-primary" id="live-verdict">Loading…</button>
+          <button class="btn btn-ghost" id="live-scans">Total scans: --</button>
+          <button class="btn btn-ghost" id="live-updated">Updated: --</button>
+        </div>
+      </div>
+
+      <div class="card hero-side">
+        <div class="metric">
+          <div class="label">Current verdict</div>
+          <div class="value" id="verdict-value">Loading…</div>
+          <div class="hint" id="verdict-hint">Only the final verdict is surfaced to the UI.</div>
+        </div>
+        <div class="metric">
+          <div class="label">Total scans</div>
+          <div class="value" id="total-scans">--</div>
+          <div class="hint">Tracked in backend history.</div>
+        </div>
+        <div class="metric">
+          <div class="label">Safe pushes</div>
+          <div class="value" id="safe-pushes">--</div>
+          <div class="hint">Successful pushes accepted by backend rules.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Total scans</div>
+        <div class="stat-value" id="stat-total-scans">--</div>
+        <div class="stat-note" id="stat-total-note">Projects checked by this user account</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Successful pushes</div>
+        <div class="stat-value" id="stat-pushed">--</div>
+        <div class="stat-note">Code allowed to move to GitHub</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Blocked pushes</div>
+        <div class="stat-value" id="stat-rejected">--</div>
+        <div class="stat-note">Rejected because of security issues</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Safe push rate</div>
+        <div class="stat-value" id="stat-safe-rate">--</div>
+        <div class="stat-note">Based on recent scan history</div>
+      </div>
+    </section>
+
+    <section class="analytics-grid">
+      <div class="card section span-6">
+        <h3>Severity mix</h3>
+        <p class="sub">Shows how the backend split issues by risk level.</p>
+        <div class="donut-wrap">
+          <div class="donut" id="severity-donut">
+            <div class="donut-center">
+              <strong id="severity-total">0</strong>
+              <span>Total issues</span>
+            </div>
+          </div>
+          <div class="severity-bars">
+            <div class="severity-bar">
+              <div class="severity-bar-head"><span>High</span><span id="high-count">0</span></div>
+              <div class="severity-track"><div class="severity-fill" id="high-fill" style="width: 0%; background: var(--bad);"></div></div>
+            </div>
+            <div class="severity-bar">
+              <div class="severity-bar-head"><span>Medium</span><span id="medium-count">0</span></div>
+              <div class="severity-track"><div class="severity-fill" id="medium-fill" style="width: 0%; background: var(--warn);"></div></div>
+            </div>
+            <div class="severity-bar">
+              <div class="severity-bar-head"><span>Low</span><span id="low-count">0</span></div>
+              <div class="severity-track"><div class="severity-fill" id="low-fill" style="width: 0%; background: var(--good);"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card section span-6">
+        <h3>Recent scan trend</h3>
+        <p class="sub">Bars update from the backend history records.</p>
+        <div class="sparkline" id="history-sparkline">
+          <div class="spark-column"><div class="spark-bar" style="height: 42%;"></div><div class="spark-label">--</div></div>
+          <div class="spark-column"><div class="spark-bar" style="height: 60%;"></div><div class="spark-label">--</div></div>
+          <div class="spark-column"><div class="spark-bar" style="height: 50%;"></div><div class="spark-label">--</div></div>
+          <div class="spark-column"><div class="spark-bar" style="height: 72%;"></div><div class="spark-label">--</div></div>
+          <div class="spark-column"><div class="spark-bar" style="height: 38%;"></div><div class="spark-label">--</div></div>
+          <div class="spark-column"><div class="spark-bar" style="height: 56%;"></div><div class="spark-label">--</div></div>
+          <div class="spark-column"><div class="spark-bar" style="height: 44%;"></div><div class="spark-label">--</div></div>
+          <div class="spark-column"><div class="spark-bar" style="height: 80%;"></div><div class="spark-label">--</div></div>
+          <div class="spark-column"><div class="spark-bar" style="height: 66%;"></div><div class="spark-label">--</div></div>
+          <div class="spark-column"><div class="spark-bar" style="height: 52%;"></div><div class="spark-label">--</div></div>
+        </div>
+      </div>
+
+      <div class="card section span-4">
+        <h3>Quick insights</h3>
+        <p class="sub">Small backend-driven summary cards.</p>
+        <div class="insights" id="insights">
+          <div class="insight"><strong>Most recent verdict</strong><span id="insight-verdict">--</span></div>
+          <div class="insight"><strong>Latest project</strong><span id="insight-project">--</span></div>
+          <div class="insight"><strong>Email delivery</strong><span id="insight-email">--</span></div>
+          <div class="insight"><strong>Push success rate</strong><span id="insight-rate">--</span></div>
+        </div>
+      </div>
+
+      <div class="card section span-8">
+        <h3>Issue intensity</h3>
+        <p class="sub">A compact visual showing how many issues exist in each severity bucket.</p>
+        <div class="mini-list">
+          <div class="mini-row"><span>High impact</span><span id="intensity-high">0</span></div>
+          <div class="mini-row"><span>Medium impact</span><span id="intensity-medium">0</span></div>
+          <div class="mini-row"><span>Low impact</span><span id="intensity-low">0</span></div>
+          <div class="mini-row"><span>Overall total</span><span id="intensity-total">0</span></div>
+        </div>
+      </div>
+
+      <div class="card section span-4">
+        <h3>Backend snapshot</h3>
+        <p class="sub">Current payload location and status.</p>
+        <div class="mini-list">
+          <div class="mini-row"><span>Payload</span><span>live-data/result.json</span></div>
+          <div class="mini-row"><span>History file</span><span>server/history.json</span></div>
+          <div class="mini-row"><span>Refresh mode</span><span>On load</span></div>
+          <div class="mini-row"><span>Scanner</span><span>Backend managed</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card section span-7">
+        <h3>Previous pushes</h3>
+        <p class="sub">A concise push log shows the last decisions from the backend.</p>
+        <table class="table record-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Project</th>
+              <th>Verdict</th>
+              <th>Issues</th>
+            </tr>
+          </thead>
+          <tbody id="history-body">
+            <tr><td colspan="4" class="small-muted">Loading history…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+
+      <div class="card section span-6">
+        <h3>Trend graph</h3>
+        <p class="sub">Recent runs shown as a compact bar graph.</p>
+        <div class="trend">
+          <div class="trend-bars">
+            <div class="trend-item">
+              <div class="trend-bar" style="height: 62%;"></div>
+              <div class="trend-label">Mon</div>
+            </div>
+            <div class="trend-item">
+              <div class="trend-bar" style="height: 82%;"></div>
+              <div class="trend-label">Tue</div>
+            </div>
+            <div class="trend-item">
+              <div class="trend-bar" style="height: 45%;"></div>
+              <div class="trend-label">Wed</div>
+            </div>
+            <div class="trend-item">
+              <div class="trend-bar" style="height: 90%;"></div>
+              <div class="trend-label">Thu</div>
+            </div>
+            <div class="trend-item">
+              <div class="trend-bar" style="height: 58%;"></div>
+              <div class="trend-label">Fri</div>
+            </div>
+            <div class="trend-item">
+              <div class="trend-bar" style="height: 74%;"></div>
+              <div class="trend-label">Sat</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <div class="footer">
+      Dashboard: verdict + history charts only. All scan, severity, email, and push logic is handled in the backend.<br />
+      If needed, this can be connected to a live API later.
+    </div>
+  </div>
+
+  <script>
+    const dataUrl = "./live-data/result.json";
+
+    function verdictClass(verdict) {
+      const v = String(verdict || "").toLowerCase();
+      if (v === "push") return "ok";
+      if (v === "reject") return "bad";
+      return "warn";
+    }
+
+    function formatDate(value) {
+      if (!value) return "--";
+      try {
+        return new Date(value).toLocaleString();
+      } catch {
+        return value;
+      }
+    }
+
+    function renderHistory(history) {
+      const body = document.getElementById("history-body");
+      if (!body) return;
+      if (!Array.isArray(history) || history.length === 0) {
+        body.innerHTML = '<tr><td colspan="4" class="small-muted">No history yet.</td></tr>';
+        return;
+      }
+
+      body.innerHTML = history.slice().reverse().map((item) => {
+        const cls = verdictClass(item.verdict);
+        return `
+          <tr>
+            <td>${formatDate(item.timestamp)}</td>
+            <td>${item.project || "--"}</td>
+            <td><span class="status ${cls}">${item.verdict || "--"}</span></td>
+            <td>${item.high || 0} High, ${item.medium || 0} Medium, ${item.low || 0} Low</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function updateChart(stats) {
+      const pushed = Number(stats?.pushed || 0);
+      const rejected = Number(stats?.rejected || 0);
+      const review = Number(stats?.review || 0);
+      const total = Math.max(pushed + rejected + review, 1);
+      const pushRate = Math.round((pushed / total) * 100);
+
+      const pie = document.querySelector(".pie");
+      const pieLabel = document.querySelector(".pie-label strong");
+      if (pie) pie.style.background = `conic-gradient(var(--good) 0 ${pushRate}%, var(--bad) ${pushRate}% 100%)`;
+      if (pieLabel) pieLabel.textContent = `${pushRate}%`;
+
+      const nodes = document.querySelectorAll(".legend-item div:last-child");
+      if (nodes[0]) nodes[0].textContent = `${pushed} records`;
+      if (nodes[1]) nodes[1].textContent = `${rejected} records`;
+      if (nodes[2]) nodes[2].textContent = `${review} records`;
+    }
+
+    function updateSeverityWidgets(summary) {
+      const high = Number(summary?.high || 0);
+      const medium = Number(summary?.medium || 0);
+      const low = Number(summary?.low || 0);
+      const total = Number(summary?.total || (high + medium + low));
+      const maxValue = Math.max(high, medium, low, 1);
+
+      const donut = document.getElementById("severity-donut");
+      const totalNode = document.getElementById("severity-total");
+      const highCount = document.getElementById("high-count");
+      const mediumCount = document.getElementById("medium-count");
+      const lowCount = document.getElementById("low-count");
+      const highFill = document.getElementById("high-fill");
+      const mediumFill = document.getElementById("medium-fill");
+      const lowFill = document.getElementById("low-fill");
+      const intensityHigh = document.getElementById("intensity-high");
+      const intensityMedium = document.getElementById("intensity-medium");
+      const intensityLow = document.getElementById("intensity-low");
+      const intensityTotal = document.getElementById("intensity-total");
+
+      if (donut) {
+        const highPct = total ? Math.round((high / total) * 100) : 0;
+        const mediumPct = total ? Math.round((medium / total) * 100) : 0;
+        const lowPct = Math.max(0, 100 - highPct - mediumPct);
+        donut.style.background = `conic-gradient(var(--bad) 0 ${highPct}%, var(--warn) ${highPct}% ${highPct + mediumPct}%, var(--good) ${highPct + mediumPct}% 100%)`;
+      }
+      if (totalNode) totalNode.textContent = total;
+      if (highCount) highCount.textContent = high;
+      if (mediumCount) mediumCount.textContent = medium;
+      if (lowCount) lowCount.textContent = low;
+      if (highFill) highFill.style.width = `${Math.round((high / maxValue) * 100)}%`;
+      if (mediumFill) mediumFill.style.width = `${Math.round((medium / maxValue) * 100)}%`;
+      if (lowFill) lowFill.style.width = `${Math.round((low / maxValue) * 100)}%`;
+      if (intensityHigh) intensityHigh.textContent = high;
+      if (intensityMedium) intensityMedium.textContent = medium;
+      if (intensityLow) intensityLow.textContent = low;
+      if (intensityTotal) intensityTotal.textContent = total;
+    }
+
+    function updateInsights(data) {
+      const history = Array.isArray(data?.history) ? data.history : [];
+      const latest = history[history.length - 1] || {};
+      const verdict = latest.verdict || data?.verdict || "--";
+      const rate = data?.stats?.total_scans ? Math.round(((data.stats.pushed || 0) / data.stats.total_scans) * 100) : 0;
+      const emailState = latest.email_sent ? "Email sent successfully." : "No email sent for this run.";
+
+      const insightVerdict = document.getElementById("insight-verdict");
+      const insightProject = document.getElementById("insight-project");
+      const insightEmail = document.getElementById("insight-email");
+      const insightRate = document.getElementById("insight-rate");
+      if (insightVerdict) insightVerdict.textContent = verdict;
+      if (insightProject) insightProject.textContent = latest.project || data?.project || "--";
+      if (insightEmail) insightEmail.textContent = emailState;
+      if (insightRate) insightRate.textContent = `${rate}% push success`;
+    }
+
+    function updateSparkline(history) {
+      const wrap = document.getElementById("history-sparkline");
+      if (!wrap) return;
+      const items = Array.isArray(history) ? history.slice(-10) : [];
+      const total = Math.max(items.length, 1);
+
+      if (!items.length) {
+        wrap.innerHTML = '<div class="small-muted">No scan history yet.</div>';
+        return;
+      }
+
+      const cols = items.map((item) => {
+        const score = Number(item.high || 0) * 3 + Number(item.medium || 0) * 2 + Number(item.low || 0);
+        const height = Math.min(100, 20 + score * 12);
+        const label = item.verdict || "--";
+        return `
+          <div class="spark-column" title="${item.project || ""} • ${item.high || 0}H ${item.medium || 0}M ${item.low || 0}L">
+            <div class="spark-bar" style="height:${height}%;"></div>
+            <div class="spark-label">${label}</div>
+          </div>
+        `;
+      }).join("");
+
+      wrap.innerHTML = cols;
+    }
+
+    async function loadDashboard() {
+      try {
+        const res = await fetch(`${dataUrl}?t=${Date.now()}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        const verdict = data.verdict || "--";
+        const summary = data.summary || {};
+        const stats = data.stats || {};
+        const history = data.history || [];
+
+        const verdictText = verdict.toUpperCase();
+        const verdictTone = verdictClass(verdict);
+
+        const liveTitle = document.getElementById("live-title");
+        const liveSummary = document.getElementById("live-summary");
+        const liveVerdict = document.getElementById("live-verdict");
+        const liveScans = document.getElementById("live-scans");
+        const liveUpdated = document.getElementById("live-updated");
+        const verdictValue = document.getElementById("verdict-value");
+        const verdictHint = document.getElementById("verdict-hint");
+        const totalScans = document.getElementById("total-scans");
+        const safePushes = document.getElementById("safe-pushes");
+
+        if (liveTitle) liveTitle.textContent = `${verdictText} — ${summary.total || 0} issues found`;
+        if (liveSummary) liveSummary.textContent = `High: ${summary.high || 0}, Medium: ${summary.medium || 0}, Low: ${summary.low || 0}. Backend-generated from the latest scan.`;
+        if (liveVerdict) {
+          liveVerdict.textContent = verdictText;
+          liveVerdict.className = `btn btn-primary status ${verdictTone}`;
+        }
+        if (liveScans) liveScans.textContent = `Total scans: ${stats.total_scans ?? 0}`;
+        if (liveUpdated) liveUpdated.textContent = `Updated: ${formatDate(data.history?.[data.history.length - 1]?.timestamp)}`;
+        if (verdictValue) verdictValue.textContent = verdictText;
+        if (verdictHint) verdictHint.textContent = verdict === "Push" ? "Backend approved the push." : "Backend blocked the push due to findings.";
+        if (totalScans) totalScans.textContent = stats.total_scans ?? 0;
+        if (safePushes) safePushes.textContent = stats.pushed ?? 0;
+
+        const rate = stats.total_scans ? Math.round(((stats.pushed || 0) / stats.total_scans) * 100) : 0;
+        const statTotal = document.getElementById("stat-total-scans");
+        const statPushed = document.getElementById("stat-pushed");
+        const statRejected = document.getElementById("stat-rejected");
+        const statRate = document.getElementById("stat-safe-rate");
+        if (statTotal) statTotal.textContent = stats.total_scans ?? 0;
+        if (statPushed) statPushed.textContent = stats.pushed ?? 0;
+        if (statRejected) statRejected.textContent = stats.rejected ?? 0;
+        if (statRate) statRate.textContent = `${rate}%`;
+
+        renderHistory(history);
+        updateChart(stats);
+        updateSeverityWidgets(summary);
+        updateInsights(data);
+        updateSparkline(history);
+      } catch (err) {
+        const liveTitle = document.getElementById("live-title");
+        const liveSummary = document.getElementById("live-summary");
+        const verdictValue = document.getElementById("verdict-value");
+        const historyBody = document.getElementById("history-body");
+        const sparkline = document.getElementById("history-sparkline");
+        if (liveTitle) liveTitle.textContent = "Live data unavailable";
+        if (liveSummary) liveSummary.textContent = "No backend JSON mirror was found yet. Run a scan first.";
+        if (verdictValue) verdictValue.textContent = "--";
+        if (historyBody) historyBody.innerHTML = '<tr><td colspan="4" class="small-muted">No live data loaded.</td></tr>';
+        if (sparkline) sparkline.innerHTML = '<div class="small-muted">No scan history yet.</div>';
+        console.warn(err);
+      }
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>

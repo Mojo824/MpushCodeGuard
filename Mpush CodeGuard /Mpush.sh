@@ -8,19 +8,28 @@
 # === Configuration ===
 # Get the directory where this script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-PROJECT_PATH="$1"
+# Support project paths that contain spaces by joining all positional args
+PROJECT_PATH="$*"
 CONFIG_FILE="config.json"
-EMAIL_SCRIPT="$SCRIPT_DIR/email_alert.py"
-SCANNER="$SCRIPT_DIR/scanner.py"
-SEVERITY="$SCRIPT_DIR/severity_rating.py"
-GIT_PUSH="$SCRIPT_DIR/git_auto_push.py"
-FORMATTER="$SCRIPT_DIR/utils/format_results.py"
 INSTALL_DEPS="$SCRIPT_DIR/install.sh"
+SERVER_BACKEND="$SCRIPT_DIR/server/backend.py"
 
 
 # === Check Arguments ===
 if [ -z "$PROJECT_PATH" ]; then
     echo "[!] Usage: ./push.sh /path/to/project"
+    exit 1
+fi
+
+# If the provided path does not exist, try trimming possible surrounding quotes
+if [ ! -d "$PROJECT_PATH" ] && [ ! -f "$PROJECT_PATH" ]; then
+    # Attempt a best-effort: remove trailing/leading quotes and whitespace
+    PROJECT_PATH="$(echo "$PROJECT_PATH" | sed -e 's/^\s*"//' -e 's/"\s*$//' -e "s/^'//" -e "s/'$//" | xargs)"
+fi
+
+if [ ! -d "$PROJECT_PATH" ] && [ ! -f "$PROJECT_PATH" ]; then
+    echo "[!] Project path or file does not exist: $PROJECT_PATH"
+    echo "    If your path contains spaces, wrap it in quotes when running this script."
     exit 1
 fi
 
@@ -36,56 +45,36 @@ read -p "📧 Enter your email to receive scan results: " USER_EMAIL
 read -p "🔖 Enter your GitHub username: " GITHUB_USER
 read -p "📁 Enter new repo name to push (no spaces): " REPO_NAME
 
-# === Run Scanner ===
-echo "[*] Scanning project files..."
-python3 "$SCANNER" "$PROJECT_PATH"
+# === Run backend processing ===
+echo "[*] Running backend scan and push workflow..."
 
-if [ ! -s scan_output.json ]; then
-    echo "[!] scan_output.json not created or empty. Exiting."
-    exit 1
-fi
-
-
-# === Run Severity Rating ===
-echo "[*] Calculating security verdict..."
-python3 "$SEVERITY" scan_output.json > verdict.txt
-VERDICT=$(grep "Verdict" verdict.txt | awk '{print $2}')
-SUMMARY_JSON=$(grep "^SUMMARY:" verdict.txt | sed 's/^SUMMARY: //')
-
-# === Format Results ===
-echo "[*] Formatting results for email..."
-echo "[DEBUG] VERDICT: $VERDICT"
-echo "[DEBUG] SUMMARY_JSON: $SUMMARY_JSON"
-
-# Call the formatter with the JSON string properly quoted
-python3 "$FORMATTER" scan_output.json "$VERDICT" "$SUMMARY_JSON" > formatted_report.txt
-
-# === Send Email Report ===
 # Validate email address format
 if [[ ! "$USER_EMAIL" =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; then
     echo "[!] Invalid email address format: $USER_EMAIL"
-    # Set to empty if invalid, script will still run but email won't be sent
     USER_EMAIL=""
 fi
 
-# Only attempt to send email if a valid address was provided
-if [ -n "$USER_EMAIL" ]; then
-    echo "[*] Sending email to $USER_EMAIL..."
-    python3 "$EMAIL_SCRIPT" "$USER_EMAIL" formatted_report.txt
-else
-    echo "[!] No valid email provided. Skipping email notification."
+RESULT_JSON="$SCRIPT_DIR/server/output/result.json"
+python3 "$SERVER_BACKEND" "$PROJECT_PATH" "$GITHUB_USER" "$REPO_NAME" "$USER_EMAIL"
+
+if [ ! -f "$RESULT_JSON" ]; then
+    echo "[!] Backend did not produce a result file. Exiting."
+    exit 1
 fi
+
+VERDICT=$(RESULT_JSON="$RESULT_JSON" python3 - <<'PY'
+import json
+import os
+from pathlib import Path
+path = Path(os.environ["RESULT_JSON"])
+data = json.loads(path.read_text())
+print(data.get("verdict", "Reject"))
+PY
+)
 
 # === Push or Reject ===
 if [[ "${VERDICT,,}" == "push" ]]; then
-    echo "[*] Pushing code to GitHub..."
-    python3 "$GIT_PUSH" "$PROJECT_PATH" "$REPO_NAME" "$GITHUB_USER"
-    echo "[✓] Successfully pushed to GitHub and emailed report."
+    echo "[✓] Backend approved the push."
 else
     echo "[!] Code did NOT meet security standards. Not pushed."
-    if [ -n "$USER_EMAIL" ]; then
-        echo "[✓] Scan report emailed to $USER_EMAIL."
-    else
-        echo "[✓] Scan completed, but no email was sent."
-    fi
 fi
